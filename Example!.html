@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Book Table with Menu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .available {
+            color: green;
+            font-weight: bold;
+        }
+
+        .unavailable {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body class="p-4">
+
+<link rel="stylesheet" href="">
+
+    <!-- Book Table Button -->
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#bookTableModal">Book Table</button>
+
+    <!-- Modal Structure -->
+    <div class="modal fade" id="bookTableModal" tabindex="-1" aria-labelledby="bookTableModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bookTableModalLabel">Book a Table & View Menu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Menu Buttons -->
+                    <div class="mt-2 mb-3">
+                        <button class="btn btn-outline-primary me-2" id="southBtn">South Indian</button>
+                        <button class="btn btn-outline-primary me-2" id="northBtn">North Indian</button>
+                        <button class="btn btn-outline-primary me-2" id="dessertsBtn">Desserts</button>
+                        <button class="btn btn-outline-primary me-2" id="icecreamBtn">Ice Cream</button>
+                    </div>
+
+                    <!-- Menu Items -->
+                    <div id="menuList" class="mb-4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const initialMenus = {
+            south: [
+                { name: "Idli", price: 20, available: true },
+                { name: "Dosa", price: 40, available: true },
+                { name: "Pongal", price: 40, available: true },
+                { name: "Meals", price: 140, available: true },
+                { name: "Chapati", price: 20, available: true },
+                { name: "Uttapam", price: 40, available: true },
+                { name: "Veg Briyani", price: 180, available: true },
+                { name: "Paniyaram", price: 10, available: true }
+            ],
+            north: [
+                { name: "Butter Chicken", price: 125, available: true },
+                { name: "Paratha", price: 70, available: true },
+                { name: "Briyani", price: 200, available: true },
+                { name: "Tandoori Chicken", price: 370, available: true },
+                { name: "Naan", price: 50, available: true },
+                { name: "Malai Kofta", price: 60, available: true },
+                { name: "Kadhi", price: 70, available: true },
+                { name: "Chicken Tikka Masala", price: 220, available: true }
+            ],
+            desserts: [
+                { name: "Jalebi", price: 25, available: true },
+                { name: "Milk Burfi", price: 25, available: true },
+                { name: "Coconut Burfi", price: 30, available: true },
+                { name: "Kheer", price: 25, available: true },
+                { name: "Kaju Katli", price: 25, available: true },
+                { name: "Halwa Recipe", price: 35, available: true },
+                { name: "Rava Laddu", price: 25, available: true },
+                { name: "Rasgulla", price: 45, available: true }
+            ],
+            icecream: [
+                { name: "Almond", price: 55, available: true },
+                { name: "Blackberry", price: 65, available: true },
+                { name: "Butterscotch", price: 75, available: true },
+                { name: "Donnatella", price: 85, available: true },
+                { name: "Espresso Fudge", price: 95, available: true },
+                { name: "French Vanilla", price: 95, available: true },
+                { name: "Honeycomb", price: 85, available: true },
+                { name: "Chocolate", price: 65, available: true }
+            ]
+        };
+
+        // Initialize localStorage
+        if (!localStorage.getItem('menus')) {
+            localStorage.setItem('menus', JSON.stringify(initialMenus));
+        }
+
+        let currentMenuType = 'south';
+
+        function loadMenu(menuType) {
+            const menuList = document.getElementById('menuList');
+            menuList.innerHTML = ''; // Clear previous
+
+            const menus = JSON.parse(localStorage.getItem('menus'));
+            const items = menus[menuType];
+
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.classList.add('d-flex', 'justify-content-between', 'border-bottom', 'py-2');
+                const statusClass = item.available ? 'available' : 'unavailable';
+                const statusText = item.available ? 'Available' : 'Unavailable';
+                div.innerHTML = `
+          <span>${item.name} - ₹${item.price}</span>
+          <span class="${statusClass}">${statusText}</span>
+        `;
+                menuList.appendChild(div);
+            });
+        }
+
+        // Button Event Listeners
+        document.getElementById('southBtn').addEventListener('click', () => {
+            currentMenuType = 'south';
+            loadMenu(currentMenuType);
+        });
+        document.getElementById('northBtn').addEventListener('click', () => {
+            currentMenuType = 'north';
+            loadMenu(currentMenuType);
+        });
+        document.getElementById('dessertsBtn').addEventListener('click', () => {
+            currentMenuType = 'desserts';
+            loadMenu(currentMenuType);
+        });
+        document.getElementById('icecreamBtn').addEventListener('click', () => {
+            currentMenuType = 'icecream';
+            loadMenu(currentMenuType);
+        });
+
+        // Load default menu on modal open
+        const modal = document.getElementById('bookTableModal');
+        modal.addEventListener('show.bs.modal', () => {
+            loadMenu(currentMenuType);
+        });
+
+        // Booking form submission
+        document.getElementById('bookingForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const name = document.getElementById('nameInput').value;
+            const time = document.getElementById('tableTime').value;
+            alert(`Thank you, ${name}! Your table is booked for ${time}.`);
+            this.reset();
+            const modalEl = bootstrap.Modal.getInstance(modal);
+            modalEl.hide();
+        });
+    </script>
+
+</body>
+
+</html>

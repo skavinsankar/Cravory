@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cravory Admin Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .sidebar {
+      width: 220px;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      background-color: #343a40;
+      padding-top: 1rem;
+    }
+
+    .main-content {
+      margin-left: 220px;
+    }
+
+    .sidebar .nav-link {
+      color: white;
+    }
+
+    .sidebar .nav-link.active,
+    .sidebar .nav-link:hover .menu {
+      background-color: #FEA116;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="sidebar text-white">
+    <div class="px-3">
+      <h4 class="text-warning">🍽 Cravory</h4>
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link active" href="../cravoryadmin/dashboard.html">📊 Dashboard</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../cravoryadmin/Menu_management.html">📋 Menu</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../cravoryadmin/user.php">🧑‍💼 Users</a>
+        </li>
+        <!-- <li class="nav-item">
+          <a class="nav-link" href="">📦 Orders</a>
+        </li> -->
+        <li class="nav-item">
+          <a class="nav-link" href="../logout.php">🚪 Logout</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="main-content px-4 py-4">
+    <h1 class="mb-4">🍽️ Annapoorna Admin Dashboard</h1>
+    <p class="lead">Overview of user activity, orders, and dish availability.</p>
+  
+    <div class="container py-5">
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">👥 Users Logged In (Weekly)</h5>
+              <canvas id="usersChart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">🍽 Orders Per Day</h5>
+              <canvas id="ordersChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Add / Update Dish Form -->
+      <div class="card mb-4">
+        <div class="card-header bg-primary text-white">Add or Update Dish</div>
+        <div class="card-body">
+          <form id="menuForm" class="row g-3">
+            <div class="col-md-4">
+              <label for="dishName" class="form-label">Dish Name</label>
+              <input type="text" class="form-control" id="dishName" required>
+            </div>
+            <div class="col-md-4">
+              <label for="dishCategory" class="form-label">Category</label>
+              <select id="dishCategory" class="form-select">
+                <option value="south">South Indian</option>
+                <option value="north">North Indian</option>
+                <option value="desserts">Desserts</option>
+                <option value="icecream">Ice Cream</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label for="dishPrice" class="form-label">Price (₹)</label>
+              <input type="number" class="form-control" id="dishPrice" required>
+            </div>
+            <div class="col-md-2">
+              <label for="dishAvailable" class="form-label">Availability</label>
+              <select id="dishAvailable" class="form-select">
+                <option value="true">Available</option>
+                <option value="false">Unavailable</option>
+              </select>
+            </div>
+            <div class="col-12 text-end">
+              <button type="submit" class="btn btn-success">Save Dish</button>
+            </div>
+          </form>
+        </div>
+      </div>
+  
+      <!-- Menu View -->
+      <h4 class="mb-3">📋 Manage Menu Items</h4>
+      <div class="mb-4">
+        <button class="btn btn-outline-primary me-2 menu-button" id="southBtn" onclick="switchMenu('south')">South
+          Indian</button>
+        <button class="btn btn-outline-primary me-2 menu-button" id="northBtn" onclick="switchMenu('north')">North
+          Indian</button>
+        <button class="btn btn-outline-primary me-2 menu-button" id="dessertsBtn"
+          onclick="switchMenu('desserts')">Desserts</button>
+        <button class="btn btn-outline-primary menu-button" id="icecreamBtn" onclick="switchMenu('icecream')">Ice
+          Cream</button>
+      </div>
+  
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th>Dish</th>
+              <th>Price</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="menuTable"></tbody>
+        </table>
+      </div>
+    </div>
+  
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+    <script>
+      // Chart setup
+      const ctx1 = document.getElementById('usersChart');
+      new Chart(ctx1, {
+        type: 'line',
+        data: {
+          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          datasets: [{
+            label: 'Users',
+            data: [10, 23, 18, 2, 35, 28, 42],
+            borderColor: 'blue',
+            backgroundColor: 'lightblue'
+          }]
+        }
+      });
+  
+      const ctx2 = document.getElementById('ordersChart');
+      new Chart(ctx2, {
+        type: 'bar',
+        data: {
+          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          datasets: [{
+            label: 'Orders',
+            data: [8, 15, 12, 20, 22, 18, 30],
+            backgroundColor: 'orange'
+          }]
+        }
+      });
+  
+      // Menu
+      const form = document.getElementById("menuForm");
+      const menuTable = document.getElementById("menuTable");
+      let currentMenuType = 'south';
+  
+      const defaultMenus = {
+        south: [], north: [], desserts: [], icecream: []
+      };
+  
+      if (!localStorage.getItem('menus')) {
+        localStorage.setItem('menus', JSON.stringify(defaultMenus));
+      }
+  
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+  
+        const name = document.getElementById("dishName").value.trim();
+        const category = document.getElementById("dishCategory").value;
+        const price = parseFloat(document.getElementById("dishPrice").value);
+        const available = document.getElementById("dishAvailable").value === "true";
+  
+        if (!name || isNaN(price)) {
+          alert("Please provide valid dish name and price.");
+          return;
+        }
+  
+        const menus = JSON.parse(localStorage.getItem("menus"));
+        const categoryMenu = menus[category];
+  
+        const existingIndex = categoryMenu.findIndex(item => item.name === name);
+        if (existingIndex > -1) {
+          categoryMenu[existingIndex] = { name, price, available };
+        } else {
+          categoryMenu.push({ name, price, available });
+        }
+  
+        menus[category] = categoryMenu;
+        localStorage.setItem("menus", JSON.stringify(menus));
+        form.reset();
+        if (category === currentMenuType) loadMenu(currentMenuType);
+      });
+  
+      function loadMenu(menuType) {
+        const menus = JSON.parse(localStorage.getItem("menus"));
+        const menuItems = menus[menuType];
+        menuTable.innerHTML = '';
+  
+        menuItems.forEach((item, index) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>
+              <span id="${menuType}-dishName${index}">${item.name}</span>
+              <input type="text" class="form-control edit-input d-none" id="${menuType}-nameInput${index}" value="${item.name}">
+            </td>
+            <td>
+              <span id="${menuType}-dishPrice${index}">₹${item.price}</span>
+              <input type="number" class="form-control edit-input d-none" id="${menuType}-priceInput${index}" value="${item.price}">
+            </td>
+            <td>
+              <button class="btn ${item.available ? 'btn-success' : 'btn-danger'}" onclick="toggleStatus('${menuType}', ${index}, this)">
+                ${item.available ? 'Available' : 'Unavailable'}
+              </button>
+            </td>
+            <td>
+              <button class="btn btn-warning btn-sm edit-btn" onclick="editDish('${menuType}', ${index})">Edit</button>
+              <button class="btn btn-success btn-sm save-btn d-none" onclick="saveDish('${menuType}', ${index})">Save</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteDish('${menuType}', ${index})">Delete</button>
+            </td>
+          `;
+          menuTable.appendChild(row);
+        });
+      }
+  
+      function toggleStatus(menuType, index, button) {
+        const menus = JSON.parse(localStorage.getItem("menus"));
+        menus[menuType][index].available = !menus[menuType][index].available;
+        localStorage.setItem("menus", JSON.stringify(menus));
+        loadMenu(menuType);
+      }
+  
+      function editDish(menuType, index) {
+        document.getElementById(`${menuType}-dishName${index}`).classList.add('d-none');
+        document.getElementById(`${menuType}-dishPrice${index}`).classList.add('d-none');
+        document.getElementById(`${menuType}-nameInput${index}`).classList.remove('d-none');
+        document.getElementById(`${menuType}-priceInput${index}`).classList.remove('d-none');
+  
+        const row = menuTable.rows[index];
+        row.querySelector('.edit-btn').classList.add('d-none');
+        row.querySelector('.save-btn').classList.remove('d-none');
+      }
+  
+      function saveDish(menuType, index) {
+        const newName = document.getElementById(`${menuType}-nameInput${index}`).value.trim();
+        const newPrice = parseFloat(document.getElementById(`${menuType}-priceInput${index}`).value);
+  
+        if (!newName || isNaN(newPrice)) {
+          alert("Name and price are required.");
+          return;
+        }
+  
+        const menus = JSON.parse(localStorage.getItem("menus"));
+        menus[menuType][index].name = newName;
+        menus[menuType][index].price = newPrice;
+        localStorage.setItem("menus", JSON.stringify(menus));
+        loadMenu(menuType);
+      }
+  
+      function deleteDish(menuType, index) {
+        const menus = JSON.parse(localStorage.getItem("menus"));
+        if (confirm(`Delete ${menus[menuType][index].name}?`)) {
+          menus[menuType].splice(index, 1);
+          localStorage.setItem("menus", JSON.stringify(menus));
+          loadMenu(menuType);
+        }
+      }
+  
+      function switchMenu(menuType) {
+        currentMenuType = menuType;
+        document.querySelectorAll('.menu-button').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`${menuType}Btn`).classList.add('active');
+        loadMenu(menuType);
+      }
+  
+      switchMenu('south');
+    </script>
+
+</body>
+
+</html>

@@ -231,6 +231,53 @@
                     </div>
 
                     <script>
+                           const initialMenus = {
+      south: [
+    { name: "Idli", price: 20, available: true },
+    { name: "Dosa", price: 40, available: true },
+    { name: "Pongal", price: 40, available: true },
+    { name: "Meals", price: 140, available: true },
+    { name: "Chapati", price: 20, available: true },
+    { name: "Uttapam", price: 40, available: true },
+    { name: "Veg Briyani", price: 180, available: true },
+    { name: "Paniyaram", price: 10, available: true }
+  ],
+  north: [
+    { name: "Butter Chicken", price: 125, available: true },
+    { name: "Paratha", price: 70, available: true },
+    { name: "Briyani", price: 200, available: true },
+    { name: "Tandoori Chicken", price: 370, available: true },
+    { name: "Naan", price: 50, available: true },
+    { name: "Malai Kofta", price: 60, available: true },
+    { name: "Kadhi", price: 70, available: true },
+    { name: "Chicken Tikka Masala", price: 220, available: true }
+  ],
+  desserts: [
+    { name: "Jalebi", price: 25, available: true },
+    { name: "Milk Burfi", price: 25, available: true },
+    { name: "Coconut Burfi", price: 30, available: true },
+    { name: "Kheer", price: 25, available: true },
+    { name: "Kaju Katli", price: 25, available: true },
+    { name: "Halwa Recipe", price: 35, available: true },
+    { name: "Rava Laddu", price: 25, available: true },
+    { name: "Rasgulla", price: 45, available: true }
+  ],
+  icecream: [
+    { name: "Almond", price: 55, available: true },
+    { name: "Blackberry", price: 65, available: true },
+    { name: "Butterscotch", price: 75, available: true },
+    { name: "Donnatella", price: 85, available: true },
+    { name: "Espresso Fudge", price: 95, available: true },
+    { name: "French Vanilla", price: 95, available: true },
+    { name: "Honeycomb", price: 85, available: true },
+    { name: "Chocolate", price: 65, available: true }
+  ]
+    };
+
+    // Initialize localStorage if not already set
+    if (!localStorage.getItem('menus')) {
+      localStorage.setItem('menus', JSON.stringify(initialMenus));
+    }
                         let currentMenuType = 'south';
 
                         // Load and display menu items
